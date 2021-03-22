@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import logo from "../../assets/logo.jpg";
+import { Link, useLocation } from "react-router-dom";
 import {
   AppBar,
   Toolbar,
@@ -32,11 +33,18 @@ const useStyles = makeStyles((theme) => ({
 
 const Navbar = ({ total_items }) => {
   const classes = useStyles();
+  const location = useLocation();
   return (
     <>
       <AppBar position="static" color="default">
         <Toolbar>
-          <Typography variant="h6" className={classes.title}>
+          <Typography
+            component={Link}
+            to="/"
+            variant="h6"
+            className={classes.title}
+            style={{ textDecoration: "none", color: "black" }}
+          >
             <img
               src={logo}
               alt="logo"
@@ -46,12 +54,21 @@ const Navbar = ({ total_items }) => {
             {"   "}
             e4e Store{" "}
           </Typography>
-          <div className={classes.grow}></div>
-          <IconButton aria-label="show 17 new notifications" color="inherit">
-            <Badge badgeContent={total_items} color="secondary">
-              <ShoppingCartIcon />
-            </Badge>
-          </IconButton>
+          {location.pathname === "/" && (
+            <>
+              <div className={classes.grow}></div>
+              <IconButton
+                component={Link}
+                to="/cart"
+                aria-label="show 17 new notifications"
+                color="inherit"
+              >
+                <Badge badgeContent={total_items} color="secondary">
+                  <ShoppingCartIcon />
+                </Badge>
+              </IconButton>
+            </>
+          )}
         </Toolbar>
       </AppBar>
     </>
