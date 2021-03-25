@@ -12,9 +12,13 @@ import {
 } from "@material-ui/core";
 import { Link, useHistory } from "react-router-dom";
 import { makeStyles } from "@material-ui/core/styles";
+
 import AddressForm from "./AddressForm";
 import PaymentForm from "./PaymentForm";
 import Confirmation from "./Confirmation";
+
+import { commerce } from "../../lib/commerce";
+
 const useStyles = makeStyles((theme) => ({
   appBar: {
     position: "relative",
@@ -68,16 +72,33 @@ const useStyles = makeStyles((theme) => ({
 
 const steps = ["Shipping address", "Payment details"];
 
-const Checkout = () => {
+const Checkout = ({ cart }) => {
   const classes = useStyles();
 
-  const [activeStep, setActiveStep] = useState(2);
+  const [activeStep, setActiveStep] = useState(0);
 
-  //   const Confirmation = () => {
-  //     <div>Payment Confirmed</div>;
-  //   };
+  const [checkoutToken, setChecloutToken] = useState(null);
 
-  const Form = () => (activeStep === 0 ? <AddressForm /> : <PaymentForm />);
+  const handleNext = () => {
+    setActiveStep(activeStep + 1);
+  };
+
+  useEffect(() => {
+    const generateToken = async () => {
+      try {
+        const token = await commerce.checkout.generateToken(cart.id, {
+          type: "cart",
+        });
+        console.log(token);
+        setChecloutToken(token);
+      } catch {}
+
+      generateToken();
+    };
+  }, []);
+
+  const Form = () =>
+    activeStep === 0 ? <AddressForm /> : <PaymentForm cart={cart} />;
 
   return (
     <>
@@ -97,6 +118,12 @@ const Checkout = () => {
           </Stepper>
           {activeStep === steps.length ? <Confirmation /> : <Form />}
         </Paper>
+
+        {activeStep === steps.length ? null : (
+          <Button onClick={handleNext} variant="contained" color="primary">
+            Next
+          </Button>
+        )}
       </main>
     </>
   );
